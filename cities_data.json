@@ -1,0 +1,65 @@
+[
+  {
+    "country": "Germany",
+    "cities": [
+      {
+        "city": "Berlin",
+        "qualityOfLifeIndex": 174.5,
+        "purchasingPowerIndex": 130.5,
+        "safetyIndex": 55.5,
+        "healthCareIndex": 66.5,
+        "costOfLivingIndex": 70.0,
+        "propertyPriceToIncomeRatio": 10.6,
+        "trafficCommuteTimeIndex": 33.3,
+        "pollutionIndex": 38.4,
+        "climateIndex": 83.3
+      },
+      {
+        "city": "Munich",
+        "qualityOfLifeIndex": 206.4,
+        "purchasingPowerIndex": 148.2,
+        "safetyIndex": 78.9,
+        "healthCareIndex": 79.5,
+        "costOfLivingIndex": 76.1,
+        "propertyPriceToIncomeRatio": 11.9,
+        "trafficCommuteTimeIndex": 28.4,
+        "pollutionIndex": 23.7,
+        "climateIndex": 76.0
+      }
+    ]
+  },
+  {
+    "country": "Spain",
+    "cities": [
+      {
+        "city": "Barcelona",
+        "qualityOfLifeIndex": 151.0,
+        "purchasingPowerIndex": 98.8,
+        "safetyIndex": 48.1,
+        "healthCareIndex": 76.7,
+        "costOfLivingIndex": 59.2,
+        "propertyPriceToIncomeRatio": 12.2,
+        "trafficCommuteTimeIndex": 30.0,
+        "pollutionIndex": 63.0,
+        "climateIndex": 95.7
+      }
+    ]
+  },
+  {
+    "country": "Netherlands",
+    "cities": [
+      {
+        "city": "Amsterdam",
+        "qualityOfLifeIndex": 209.4,
+        "purchasingPowerIndex": 135.6,
+        "safetyIndex": 74.3,
+        "healthCareIndex": 81.5,
+        "costOfLivingIndex": 82.6,
+        "propertyPriceToIncomeRatio": 9.3,
+        "trafficCommuteTimeIndex": 22.1,
+        "pollutionIndex": 22.6,
+        "climateIndex": 87.5
+      }
+    ]
+  }
+]
