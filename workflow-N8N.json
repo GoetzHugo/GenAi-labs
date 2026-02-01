@@ -1,0 +1,172 @@
+{
+  "name": "Stage Finder - Internship Search",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "01d4cc6e-877b-4733-b8c3-534163544bab",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.search_query }}",
+        "options": {
+          "search_depth": "advanced",
+          "max_results": 3,
+          "include_raw_content": false
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c059474f-1ee3-4905-a9db-50c40103c4b8",
+      "name": "Search",
+      "credentials": {
+        "tavilyApi": {
+          "id": "uJVxAbQfWowFZ5be",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCCkYefSQXFmqua_jgqb5hzV9LmjZaX6Fo",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"={{ 'Analyse cette offre de stage et extrait les informations au format JSON:\\n\\nOffre: ' + $json.tavilyResults[0].content + '\\n\\nRetourne uniquement un JSON valide avec ces champs:\\n- company: nom entreprise\\n- location: ville\\n- start_date: date début\\n- duration: durée\\n- salary: rémunération\\n- skills: liste compétences\\n- description_summary: résumé 1 phrase' }}\"\n    }]\n  }]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "d1ddb307-8e78-448f-9d41-19c419cdda60",
+      "name": "Gemini"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construire le prompt pour Gemini\nconst offerContent = $json.tavilyResults[0].content;\n\nconst prompt = `Analyse cette offre de stage et extrait les informations au format JSON:\n\nOffre: ${offerContent}\n\nRetourne UNIQUEMENT un JSON valide (sans markdown, sans \\`\\`\\`json) avec ces champs:\n{\n  \"company\": \"nom de l'entreprise\",\n  \"location\": \"ville exacte\",\n  \"start_date\": \"date de début ou 'Non spécifié'\",\n  \"duration\": \"durée en mois ou 'Non spécifié'\",\n  \"salary\": \"rémunération ou 'Non spécifié'\",\n  \"skills\": [\"compétence1\", \"compétence2\"],\n  \"description_summary\": \"résumé en 1 phrase\"\n}`;\n\nreturn {\n  ...$json,\n  gemini_prompt: prompt\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "fb89e6aa-723a-43d0-a788-f44f7487da6d",
+      "name": "Prepare Gemini Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/city/score",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"city_name\": \"{{ $json.query.split(' in ')[1] }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5cbd9d41-09ae-4b72-b222-591c8e5d6734",
+      "name": "Parse City Score"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cities = [\n  {\"city\": \"Berlin\"},\n  {\"city\": \"Munich\"},\n  {\"city\": \"Amsterdam\"},\n  {\"city\": \"Barcelona\"}\n]\n\nconst technologies = [\n  {\"technology\": \"AI\"},\n  {\"technology\": \"DevOps\"},\n  {\"technology\": \"Cybersecurity\"},\n  {\"technology\": \"Blockchain\"}\n]\n\nconst combinations = cities.flatMap(cityObj => {\n  return technologies.map(techObj => ({\n    city: cityObj.city,\n    technology: techObj.technology,\n    search_query: `internship ${techObj.technology} in ${cityObj.city}`\n  }));\n});\n\nreturn combinations;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "02cb1074-8f93-4339-8f5b-3019028bc7c5",
+      "name": "Combinaisons"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Combinaisons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "Parse City Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Gemini Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse City Score": {
+      "main": [
+        [
+          {
+            "node": "Prepare Gemini Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combinaisons": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "211ded7d-be3f-4ec6-8783-d9a0f82df033",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd09cfdee5c23cdaa2b6a851625b2931a4cbe4f93ea456f2031114b905870327"
+  },
+  "id": "FCoz0qBHL_FVde9oKAKQN",
+  "tags": []
+}
